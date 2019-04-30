@@ -25,7 +25,7 @@ use super::traits::{ECPoint, ECScalar};
 use arithmetic::traits::{Converter, Modulo};
 use cryptographic_primitives::hashing::hash_sha256::HSha256;
 use cryptographic_primitives::hashing::traits::Hash;
-use merkle::Hashable;
+//use merkle::Hashable;
 use ring::digest::Context;
 use serde::de;
 use serde::de::{MapAccess, Visitor};
@@ -460,12 +460,12 @@ impl ECPoint<PK, SK> for Secp256k1Point {
     }
 }
 
-impl Hashable for Secp256k1Point {
-    fn update_context(&self, context: &mut Context) {
-        let bytes: Vec<u8> = self.pk_to_key_slice();
-        context.update(&bytes);
-    }
-}
+// impl Hashable for Secp256k1Point {
+//     fn update_context(&self, context: &mut Context) {
+//         let bytes: Vec<u8> = self.pk_to_key_slice();
+//         context.update(&bytes);
+//     }
+// }
 
 impl Mul<Secp256k1Scalar> for Secp256k1Point {
     type Output = Secp256k1Point;
