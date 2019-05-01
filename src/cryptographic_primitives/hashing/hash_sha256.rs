@@ -8,31 +8,45 @@
 use super::traits::Hash;
 use arithmetic::traits::Converter;
 use elliptic::curves::traits::{ECPoint, ECScalar};
-use ring::digest::{Context, SHA256};
+//use ring::digest::{Context, SHA256};
+
+use cryptoxide::digest::Digest;
+use cryptoxide::sha2::Sha256;
+
 use BigInt;
 use {FE, GE};
 
 pub struct HSha256;
 
 impl Hash for HSha256 {
-    fn create_hash(big_ints: &[&BigInt]) -> BigInt {
-        let mut digest = Context::new(&SHA256);
+fn create_hash(big_ints: &[&BigInt]) -> BigInt {
+        let mut hasher = Sha256::new();
 
+        let mut flatten_array: Vec<u8> = Vec::new();
         for value in big_ints {
-            digest.update(&BigInt::to_vec(value));
+            let bytes: Vec<u8> = BigInt::to_vec(value); //value.borrow().into();
+            flatten_array.extend_from_slice(&bytes);
         }
 
-        BigInt::from(digest.finish().as_ref())
+        hasher.input(&flatten_array);
+        let mut result = [0; 32]; //TODO: parametrize 32/64 usize to fit both SHA256/512 algorithms
+        hasher.result(&mut result);
+        BigInt::from(result.as_ref())
     }
 
     fn create_hash_from_ge(ge_vec: &[&GE]) -> FE {
-        let mut digest = Context::new(&SHA256);
+        let mut hasher = Sha256::new();
 
+        let mut flatten_array: Vec<u8> = Vec::new();
         for value in ge_vec {
-            digest.update(&value.pk_to_key_slice());
+            let bytes = &value.pk_to_key_slice();
+            flatten_array.extend_from_slice(bytes);
         }
 
-        let result = BigInt::from(digest.finish().as_ref());
+        hasher.input(&flatten_array);
+        let mut result_buf = [0; 32]; //TODO: parametrize 32/64 usize to fit both SHA256/512 algorithms
+        hasher.result(&mut result_buf);
+        let result = BigInt::from(result_buf.as_ref());
         ECScalar::from(&result)
     }
 }

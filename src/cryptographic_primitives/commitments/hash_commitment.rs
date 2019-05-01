@@ -15,19 +15,28 @@ use BigInt;
 use super::traits::Commitment;
 use super::SECURITY_BITS;
 use arithmetic::traits::Samplable;
-use sha3::{Digest, Sha3_256};
+//use sha3::{Digest, Sha3_256};
+
+use cryptoxide::digest::Digest;
+use cryptoxide::sha3::Sha3;
+
+
 //TODO:  using the function with BigInt's as input instead of string's makes it impossible to commit to empty message or use empty randomness
 impl Commitment<BigInt> for HashCommitment {
     fn create_commitment_with_user_defined_randomness(
         message: &BigInt,
         blinding_factor: &BigInt,
     ) -> BigInt {
-        let mut digest = Sha3_256::new();
+        let mut hasher = Sha3::sha3_256();
         let bytes_message: Vec<u8> = message.into();
-        digest.input(&bytes_message);
+
+        hasher.input(&bytes_message);
         let bytes_blinding_factor: Vec<u8> = blinding_factor.into();
-        digest.input(&bytes_blinding_factor);
-        BigInt::from(digest.result().as_ref())
+        hasher.input(&bytes_blinding_factor);
+
+        let mut result = [0; 32];
+        hasher.result(&mut result);
+        BigInt::from(result.as_ref())
     }
 
     fn create_commitment(message: &BigInt) -> (BigInt, BigInt) {
@@ -46,7 +55,9 @@ mod tests {
     use super::HashCommitment;
     use super::SECURITY_BITS;
     use arithmetic::traits::Samplable;
-    use sha3::{Digest, Sha3_256};
+    //use sha3::{Digest, Sha3_256};
+    use cryptoxide::digest::Digest;
+    use cryptoxide::sha3::Sha3;
     use BigInt;
 
     #[test]
@@ -94,17 +105,20 @@ mod tests {
 
     #[test]
     fn test_hashing_create_commitment_with_user_defined_randomness() {
-        let mut digest = Sha3_256::new();
+        let mut hasher = Sha3::sha3_256();
         let message = BigInt::one();
         let commitment = HashCommitment::create_commitment_with_user_defined_randomness(
             &message,
             &BigInt::zero(),
         );
         let message2: Vec<u8> = (&message).into();
-        digest.input(&message2);
+        hasher.input(&message2);
         let bytes_blinding_factor: Vec<u8> = (&BigInt::zero()).into();
-        digest.input(&bytes_blinding_factor);
-        let hash_result = BigInt::from(digest.result().as_ref());
+        hasher.input(&bytes_blinding_factor);
+        
+        let mut result = [0; 32];
+        hasher.result(&mut result);
+        let hash_result = BigInt::from(result.as_ref());
         assert_eq!(&commitment, &hash_result);
     }
 

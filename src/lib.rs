@@ -7,11 +7,13 @@
 
 #[macro_use]
 extern crate serde_derive;
-extern crate merkle;
-extern crate ring;
+// extern crate merkle;
+// extern crate ring;
+extern crate cryptoxide;
+
 extern crate serde;
 extern crate serde_json;
-extern crate sha3;
+// extern crate sha3;
 extern crate zeroize;
 
 #[cfg(feature = "ecc")]
