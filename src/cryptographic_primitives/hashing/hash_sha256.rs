@@ -8,7 +8,6 @@
 use super::traits::Hash;
 use arithmetic::traits::Converter;
 use elliptic::curves::traits::{ECPoint, ECScalar};
-//use ring::digest::{Context, SHA256};
 
 use cryptoxide::digest::Digest;
 use cryptoxide::sha2::Sha256;
@@ -22,13 +21,11 @@ impl Hash for HSha256 {
 fn create_hash(big_ints: &[&BigInt]) -> BigInt {
         let mut hasher = Sha256::new();
 
-        let mut flatten_array: Vec<u8> = Vec::new();
         for value in big_ints {
             let bytes: Vec<u8> = BigInt::to_vec(value); //value.borrow().into();
-            flatten_array.extend_from_slice(&bytes);
+            hasher.input(&bytes);
         }
 
-        hasher.input(&flatten_array);
         let mut result = [0; 32]; //TODO: parametrize 32/64 usize to fit both SHA256/512 algorithms
         hasher.result(&mut result);
         BigInt::from(result.as_ref())
@@ -37,13 +34,11 @@ fn create_hash(big_ints: &[&BigInt]) -> BigInt {
     fn create_hash_from_ge(ge_vec: &[&GE]) -> FE {
         let mut hasher = Sha256::new();
 
-        let mut flatten_array: Vec<u8> = Vec::new();
         for value in ge_vec {
             let bytes = &value.pk_to_key_slice();
-            flatten_array.extend_from_slice(bytes);
+            hasher.input(bytes);
         }
 
-        hasher.input(&flatten_array);
         let mut result_buf = [0; 32]; //TODO: parametrize 32/64 usize to fit both SHA256/512 algorithms
         hasher.result(&mut result_buf);
         let result = BigInt::from(result_buf.as_ref());

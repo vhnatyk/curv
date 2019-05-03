@@ -15,7 +15,6 @@ use BigInt;
 use super::traits::Commitment;
 use super::SECURITY_BITS;
 use arithmetic::traits::Samplable;
-//use sha3::{Digest, Sha3_256};
 
 use cryptoxide::digest::Digest;
 use cryptoxide::sha3::Sha3;
@@ -55,7 +54,6 @@ mod tests {
     use super::HashCommitment;
     use super::SECURITY_BITS;
     use arithmetic::traits::Samplable;
-    //use sha3::{Digest, Sha3_256};
     use cryptoxide::digest::Digest;
     use cryptoxide::sha3::Sha3;
     use BigInt;
