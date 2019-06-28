@@ -59,6 +59,6 @@ features = ["rand", "serde"]
 # [dependencies.curve25519-dalek]
 # version = "1.0.1"
 
-[dependencies.cryptoxide]
-version = "0.1.0"
+# [dependencies.cryptoxide]
+# version = "0.1.0"
 
