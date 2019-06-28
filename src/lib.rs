@@ -7,7 +7,6 @@
 
 #[macro_use]
 extern crate serde_derive;
-extern crate merkle;
 extern crate ring;
 extern crate serde;
 extern crate serde_json;
